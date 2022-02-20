@@ -37,9 +37,33 @@ class PlaceFinder {
       this.map = new Maps(coordinates);
     }
 
-    this.shareBtn.disabled = false;
-    const shareLinkInputElement = document.getElementById('share-link');
-    shareLinkInputElement.value = `${location.origin}/my-place?address=${encodeURI(address)}&lat=${coordinates.lat}&lng=${coordinates.lgt}`;
+    fetch('http://localhost:3000/add-location', {
+      method: 'POST',
+      body: JSON.stringify({
+        address: address,
+        lat: coordinates.lat,
+        lng: coordinates.lgt
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(response => {
+        return response.json();
+      })
+      .then(data => {
+        console.log('server', data);
+        const locationId = data.locId;
+        this.shareBtn.disabled = false;
+        const shareLinkInputElement = document.getElementById('share-link');
+        shareLinkInputElement.value = `${location.origin}/my-place?location=${locationId}`;  
+      })
+    ;
+
+    // this.shareBtn.disabled = false;
+    // const shareLinkInputElement = document.getElementById('share-link');
+    // shareLinkInputElement.value = `${location.origin}/my-place?address=${encodeURI(address)}&lat=${coordinates.lat}&lng=${coordinates.lgt}`;
+  
   }
   
   locateUserHandler() {
